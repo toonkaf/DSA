@@ -9,28 +9,26 @@ class Song:
     def show_info(self):
         """_"""
         minute , sec = divmod(self.durations,60)
-        print(f"{self.name} <|> {self.genre} <|> {minute}.{sec:>02}")
-    def re_info(self):
-        minute , sec = divmod(self.durations,60)
-        return f"{self.name} <|> {self.genre} <|> {minute}.{sec:>02}"
-
-
+        return (f"{self.name} <|> {self.genre} <|> {minute}.{sec:>02}")
 class Queue:
     """_"""
     def __init__(self,count:int=0,head:Song=None):
         self.count = count
         self.head = head
+        self.duration = 0
     def enqueue(self, song:Song):
         """_"""
         n = self.head
         if self.head is None:
             self.head = song
             self.count += 1
+            self.duration += song.durations
             return
         while n is not None:
             if n.next is None:
                 n.next = song
                 self.count += 1
+                self.duration += song.durations
                 return
             n = n.next
     def dequeue(self):
@@ -41,14 +39,13 @@ class Queue:
         x = self.head
         self.head = n.next
         self.count -= 1
-        print("Dequeue item:",end =" ")
+        self.duration -= x.durations
         return x
     def peek(self):
         n = self.head
         if n is None:
             print("Underflow! peek from an empty queue")
             return
-        print("Peek item:",end=" ")
         return self.head
     def isEmpty(self):
         return not bool(self.count)
@@ -59,7 +56,7 @@ class Queue:
             print("Queue is empty!")
             return
         while n is not None:
-            print(f"Queue#{counts}",n.re_info())
+            print(f"Queue#{counts}",n.show_info())
             n = n.next
             counts += 1
             if counts > self.count:
@@ -70,10 +67,11 @@ class Queue:
         if n is None:
             print("Nothing here! Please add some song")
             return
-        while timer > 0:
+        timer = timer % self.duration
+        while timer >= 0:
             timer -= n.durations
-            if timer <= 0 :
-                print(f"Queue#{counts}",n.re_info())
+            if timer < 0 :
+                print(f"Queue#{counts}",n.show_info())
                 return
             if n.next is None:
                 n = self.head
@@ -130,35 +128,35 @@ class Queue:
         pass
     
 
-def main():
+def main(): #อธิบายโค้ดในส่วนของ main()
     """this is main function"""
-    q = Queue()
-    while (choice := input()) != "End":
-        command, data = choice.split(": ")
-        match command:
+    q = Queue() #สร้าง Queue ว่างขึ้นมา
+    while (choice := input()) != "End": #ลูปรับค่าไปเรื่อย ๆ จนกว่าจะเจอคำว่า End
+        command, data = choice.split(": ") #แยก input ออกเป็น 2 ค่า คือ command ในการเรียกใช้แต่ละ methods และ data สำหรับใส่เป็น Arguments ของ methods นั้น ๆ ( ถ้ามี )
+        match command: # ใช้ match-case เพื่อจับคู่คำสั่งการทำงาน
             case "enqueue":
-                q.enqueue(Song(*data.split("|")))
+                q.enqueue(Song(*data.split("|")))  # เพิ่ม object ที่สร้างจากคลาส Song เข้าไปที่ส่วนท้ายของคิว
             case "dequeue":
-                temp = q.dequeue()
-                if temp:
-                    temp.show_info()
+                temp = q.dequeue() # ทำการลบและคืนค่าข้อมูลส่วนหัวของคิว มาไว้ในตัวแปร temp
+                if temp: # ถ้า temp ไม่เท่ากับ None ให้แสดงข้อความออกมา
+                    print("Dequeue item:", temp.show_info())
             case "peek":
-                temp = q.peek()
-                if temp:
-                    temp.show_info()
-            case "isEmpty":
+                temp= q.peek() # ทำการคืนค่าข้อมูลส่วนหัวของคิว มาไว้ในตัวแปร temp
+                if temp:# ถ้า temp ไม่เท่ากับ None ให้แสดงข้อความออกมา
+                    print("Peek item:", temp.show_info())
+            case "isEmpty":  # เรียกใช้ isEmpty เพื่อดูว่าคิวว่างหรือไม่
                 print(q.isEmpty())
-            case "showQueue":
+            case "showQueue": # เรียกใช้ showQueue เพื่อแสดงผลข้อมูลเพลงในคิวตามลำดับ
                 q.show_Queue()
-            case "lastSong":
+            case "lastSong":  # เรียกใช้ lastSong เพื่อดูข้อมูลเพลงสุดท้ายที่จะได้ฟัง
                 q.lastSong(int(data))
-            case "removeSong":
+            case "removeSong": # เรียกใช้ removeSong เพื่อลบเพลงนั้นๆ ออกจากคิว
                 q.removeSong(data)
-            case "groupSong":
+            case "groupSong": # เรียกใช้ groupSong เพื่อแสดงชื่อเพลงตามประเภทของเพลง
                 q.groupSong()
-            case "undo":
+            case "undo": # เรียกใช้ undo เพื่อย้อนคืนการทำงาน
                 q.undo()
-            case "rev":
+            case "rev": # เรียกใช้ rev ย้อนกลับลำดับของเพลงในคิว
                 q.rev_queue()
-    q.show_Queue()
+    q.show_Queue() # แสดงข้อมูลเพลงในคิว ก่อนจะจบการทำงานของฟังก์ชัน
 main()
