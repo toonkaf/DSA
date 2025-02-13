@@ -49,15 +49,6 @@ def binary_search(data: list,name: str):
     print(f"{name} does not exists.")
     print(f"Comparisons times: {count}")
 
-                
-                
-    
-    
-    
-    
-    
-    
-    
 def main():
     """main"""
     raw = json.loads(input())
@@ -66,5 +57,3 @@ def main():
         data.append(Student(i["id"], i["name"], i["gpa"]))
     binary_search(data,input())
 main()
-        
-    
